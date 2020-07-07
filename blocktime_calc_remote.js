@@ -1,23 +1,20 @@
 const fetch = require("node-fetch");
+const ObjectsToCsv = require("objects-to-csv");
 
 // Monero Mainnet Block Explorer
-let url = "http://moneroblocks.info/api/";
+let url = "https://moneroblocks.info/api/";
 
 const LAST_N_BLOCKS = 10;
 
 async function getBlockheight() {
-  let response = await fetch(url + "get_stats/", {
-    method: "GET",
-  });
+  let response = await fetch(url + "get_stats/");
   let data = await response.json();
   return data.height;
 }
 
 async function getBlockHeaders(start, end) {
   async function getBlockHeader(index) {
-    let response = await fetch(url + "get_block_header/" + index, {
-      method: "GET",
-    });
+    let response = await fetch(url + "get_block_header/" + index);
     let data = await response.json();
     return await data.block_header;
   }
@@ -30,29 +27,44 @@ async function getBlockHeaders(start, end) {
 }
 
 async function getTimestamps(blockheaders) {
-  let timestamps = [];
-  blockheaders.map((header) => {
-    timestamps.push({ height: header.height, timestamp: header.timestamp });
+  return blockheaders.map(({ height, timestamp }) => {
+    return { height: height, timestamp: timestamp };
   });
-  return timestamps; // Array
 }
 
 async function getTimedeltas(timestamps) {
   let timedeltas = [];
   timestamps.map((x, index, arr) => {
-    // Zeitdiffrenzen zwischen allen Blöcken n berechnen (n-1)
+    // Calculate time difference of selected n blocks - (n-1) results
     if (index != arr.length - 1) {
       timedeltas.push({
         height: x.height + 1,
-        delta: arr[index + 1].timestamp - x.timestamp,
+        blocktime: arr[index + 1].timestamp - x.timestamp,
       });
     }
   });
-  console.dir(timedeltas);
-  return timedeltas; // Array
+  return timedeltas;
+}
+
+async function calcDeviation(blocktimes) {
+  blocktimes.map((block) => {
+    // deviation from the target value of 120 seconds per block
+    block.deviation = Math.abs(120 - block.blocktime);
+  });
+  return blocktimes;
+}
+
+async function exportCsv(blocktimes) {
+  const csv = new ObjectsToCsv(blocktimes);
+  // Save to file:
+  await csv.toDisk("./blocktimes.csv");
+  // Return the CSV file as string:
+  console.log(await csv.toString());
 }
 
 getBlockheight()
   .then((height) => getBlockHeaders(height - LAST_N_BLOCKS, height))
   .then(getTimestamps)
-  .then(getTimedeltas);
+  .then(getTimedeltas)
+  .then(calcDeviation)
+  .then(exportCsv);
