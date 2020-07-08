@@ -4,7 +4,7 @@ const ObjectsToCsv = require("objects-to-csv");
 // Monero Mainnet Block Explorer
 let url = "https://moneroblocks.info/api/";
 
-const LAST_N_BLOCKS = 10;
+const LAST_N_BLOCKS = 1000;
 
 async function getBlockheight() {
   let response = await fetch(url + "get_stats/");
