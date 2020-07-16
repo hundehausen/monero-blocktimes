@@ -38,7 +38,6 @@ async function getBlockHeaderByHash(hash) {
     body: JSON.stringify(data),
   });
   let response_json = await response.json();
-  console.dir(response_json);
   return await response_json.result.block_header.height;
 }
 
