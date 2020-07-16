@@ -26,6 +26,9 @@ async function getBlockHeaderByHash(hash) {
   let data = {
     jsonrpc: "2.0",
     method: "get_block_header_by_hash",
+    params: {
+      hash: hash,
+    },
   };
   let response = await fetch(url, {
     method: "POST",
@@ -35,6 +38,7 @@ async function getBlockHeaderByHash(hash) {
     body: JSON.stringify(data),
   });
   let response_json = await response.json();
+  console.dir(response_json);
   return await response_json.result.block_header.height;
 }
 
