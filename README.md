@@ -25,6 +25,14 @@ Blockhöhe und den aktuellen Unix-Timestamp von dem System auf dem es läuft.
 Diese Methode ist genauer, eine Abweichung entsteht nur durch die Latenz
 des Netzwerkes.
 
+#### Nutzung
+
+    ./monerod --block-notify="/usr/bin/node /home/user/monero-blocktimes/block_notify.js %s"
+
+oder in der Konfigurationsdatei:
+
+    block-notify=/usr/bin/node /home/user/monero-blocktimes/block_notify.js %s
+
 ## English
 
 ### blocktime_calc.js and blocktime_calc_remote.js
@@ -44,3 +52,11 @@ This scripts get executed from the flag --block-notify of monerod, as soon
 as the monero daemon recieves a new block from the network. The script
 saves the blockheight with the unix-timestamp of the system it is running on.
 This is much more precise, because you only get the latency of the monero network.
+
+#### Usage
+
+    ./monerod --block-notify="/usr/bin/node /home/user/monero-blocktimes/block_notify.js %s"
+
+or in the config file:
+
+    block-notify=/usr/bin/node /home/user/monero-blocktimes/block_notify.js %s
